@@ -1,5 +1,11 @@
 .display {
 
+  &-menu {
+    position: absolute;
+    background: white;
+    top: 0;
+    left: 0;
+  }
   &-product {
     width: 10rem;
     height: 10rem;

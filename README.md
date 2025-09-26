@@ -1,1 +1,1 @@
-# 👜 Product Displays
+# 👜 Product Displays - Frontend

@@ -12,23 +12,6 @@ const Pedestal = ({ products }) => {
     ? `http://${location.hostname}:8000`
     : "https://coalatree-product-displays-backend.onrender.com/";
 
-  // useEffect(() => {
-
-
-
-  //   const socket = io({
-  //     transports: ["websocket"],
-  //     query: { role: "pedestal" },
-  //   });
-
-  //   socket.on("connect", () => {
-  //     socketRef.current = socket;
-  //   });
-
-  //   return () => {
-  //     socket.disconnect();
-  //   };
-  // }, []);
 
   const handleOrientation = (event) => {
     const rotation = event.alpha;
@@ -42,27 +25,31 @@ const Pedestal = ({ products }) => {
   const startExperience = async () => {
     if (location.hostname === 'localhost') {
       setStarted(true);
-
     }
     else {
-      if (document.documentElement.requestFullscreen) {
-        await document.documentElement.requestFullscreen();
-      } else if (document.documentElement.webkitRequestFullScreen) {
-        document.documentElement.webkitRequestFullScreen();
-      }
+      // if (document.documentElement.requestFullscreen) {
+      //   await document.documentElement.requestFullscreen();
+      // } else if (document.documentElement.webkitRequestFullScreen) {
+      //   document.documentElement.webkitRequestFullScreen();
+      // }
 
-      try {
-        const response = await DeviceMotionEvent.requestPermission();
-        if (response !== "granted") {
-          // alert("Motion permission denied");
-          return;
-        }
-      } catch (err) {
-        console.error("Error requesting motion permission:", err);
-        return;
-      }
+      // alert('here')
+
+      // try {
+      //   const response = await DeviceMotionEvent.requestPermission();
+      //   alert(response)
+      //   if (response !== "granted") {
+      //     alert("Motion permission denied");
+      //     return;
+      //   }
+      // } catch (err) {
+      //   console.error("Error requesting motion permission:", err);
+      //   alert(err)
+      //   return;
+      // }
 
       addEventListener("deviceorientation", handleOrientation);
+      alert('granted')
       setStarted(true);
     }
   };
@@ -96,7 +83,7 @@ const Pedestal = ({ products }) => {
           }}
           onClick={startExperience}
         >
-          Touch To Begin
+          Touch to begin
         </button>
 
       )}
