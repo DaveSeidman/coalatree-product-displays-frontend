@@ -1,15 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useControls, Leva } from 'leva';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import Pedestal from './routes/pedestal';
+import Display from './routes/display';
 import './index.scss';
 
-const App = () => {
-
+function App() {
+  const products = ['duffle', 'socks', 'shirt', 'blanket'];
 
   return (
-    <div className="app">
-      <Leva />
+    <div className='app'>
+      <Routes>
+        <Route path="/" element={
+          <div className="menu">
+            <a href="#/pedestal">Pedestal</a>
+            <a href="#/display">Display</a>
+          </div>
+        } />
+        <Route path="/pedestal" element={<Pedestal products={products} />} />
+        <Route path="/display" element={<Display products={products} />} />
+      </Routes>
     </div>
   );
-};
+}
 
 export default App;
