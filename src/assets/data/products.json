@@ -1,0 +1,49 @@
+[
+  {
+    "id": 1,
+    "name": "shirt",
+    "model": "models/shirt.glb",
+    "features": [
+      "Lightweight",
+      "UV Resistant",
+      "Four-Way Stretch",
+      "Quick Dry",
+      "Sustainably Made",
+      "Reinforced Seams",
+      "Packable"
+    ]
+  },
+  {
+    "id": 2,
+    "name": "blanket",
+    "model": "models/blanket.glb",
+    "features": [
+      "Water and spill reiststant",
+      "Integrated Modular System",
+      "Three Season Comfort"
+    ]
+  },
+  {
+    "id": 3,
+    "name": "socks",
+    "model": "models/socks.glb",
+    "features": [
+      "Four-Way Stretch",
+      "Quick Dry",
+      "Sustainably Made",
+      "Reinforced Seams"
+    ]
+  },
+  {
+    "id": 4,
+    "name": "duffle",
+    "model": "models/duffle.glb",
+    "features": [
+      "U-shaped Zipper",
+      "Removable Straps",
+      "Nylon webbing handles",
+      "Exterior pocket",
+      "High contrast liner"
+    ]
+  }
+]

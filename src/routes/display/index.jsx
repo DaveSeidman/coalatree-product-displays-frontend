@@ -1,29 +1,68 @@
 import React, { useRef, useState, useEffect, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { io } from "socket.io-client";
-import { Environment, ContactShadows, OrbitControls, useGLTF } from "@react-three/drei";
-import socksModel from '../../assets/models/socks2.glb';
-import duffleModel from '../../assets/models/duffle2.glb';
-
+import products from "../../assets/data/products.json";
+import { Environment, ContactShadows, OrbitControls, useGLTF, MeshTransmissionMaterial, Billboard, Image, Float } from "@react-three/drei";
 import "./index.scss";
 
-// Simple loader component for your GLB
-function ProductModel({ url, rotation }) {
+function ProductModel({ url }) {
   const group = useRef();
   const { scene } = useGLTF(url);
-
   return (
-    <group
-      ref={group}
-      rotation={[0, rotation * (Math.PI / 180), 0]}
-      position={[0, -.5, 0]}
-    >
-      <primitive object={scene} />
+    <group ref={group} position={[0, 0, 0]}>
+      <Float
+        speed={1} // Animation speed, defaults to 1
+        rotationIntensity={1} // XYZ rotation intensity, defaults to 1
+        floatIntensity={1} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
+        floatingRange={[-.1, .1]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
+      >
+        <primitive object={scene} />
+      </Float>
     </group>
   );
 }
 
-const Display = ({ products }) => {
+function FeatureBubbles({ features }) {
+  return (
+    <group>
+      {features.map((feature, index) => {
+        const angle = (index / features.length) * 360;
+        const radians = angle * (Math.PI / 180);
+
+        return (
+          <group key={index} rotation={[0, radians, 0]}>
+            {/* Bubble sphere */}
+            <mesh position={[0, 0, 1]}>
+              <sphereGeometry args={[0.1, 32, 32]} />
+              <MeshTransmissionMaterial
+                thickness={0.2}
+                roughness={0.1}
+                transmission={1}
+                ior={1.3}
+                chromaticAberration={0.02}
+                anisotropy={0.1}
+                distortion={0.1}
+                distortionScale={0.2}
+                temporalDistortion={0.1}
+              />
+            </mesh>
+
+            {/* Billboarded image inside */}
+            <Billboard follow={true} position={[0, -.05, 1]}>
+              <Image
+                url="images/uv-resistant.png"
+                scale={[0.25, 0.25, 1]}
+                transparent
+              />
+            </Billboard>
+          </group>
+        );
+      })}
+    </group>
+  );
+}
+
+const Display = () => {
   const socketRef = useRef();
   const [fullscreen, setFullscreen] = useState(false);
   const isLocalhost = window.location.hostname !== "daveseidman.github.io";
@@ -32,11 +71,6 @@ const Display = ({ products }) => {
     : "https://cocktail-generator-server.onrender.com/";
   const [rotation, setRotation] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState(null);
-
-  const models = {
-    socks: socksModel,
-    duffle: duffleModel,
-  }
 
   const handleFullscreenChange = () => {
     setFullscreen(document.fullscreenElement !== null);
@@ -52,7 +86,6 @@ const Display = ({ products }) => {
 
   const setProduct = (product) => {
     setSelectedProduct(product);
-
     socketRef.current = io(URL, {
       transports: ["websocket"],
       query: { role: "display", product },
@@ -74,29 +107,26 @@ const Display = ({ products }) => {
       <Canvas
         shadows
         camera={{ position: [0, 1, 2], fov: 35 }}
-        style={{ position: 'absolute', inset: 0 }}
+        style={{ position: "absolute", inset: 0 }}
       >
         <Suspense fallback={null}>
           <Environment preset="sunset" background blur={2} />
 
-          {/* Model */}
           {selectedProduct && (
-            <ProductModel
-              url={models[selectedProduct]}
-              rotation={rotation}
-            />
+            <group rotation={[0, rotation * (Math.PI / 180), 0]}>
+              <ProductModel url={selectedProduct.model} />
+              <FeatureBubbles features={selectedProduct.features} />
+            </group>
           )}
 
-          {/* Contact shadows */}
           <ContactShadows
-            position={[0, -.5, 0]}
+            position={[0, -0.5, 0]}
             opacity={0.25}
             scale={5}
-            blur={.25}
+            blur={0.25}
             far={1}
           />
 
-          {/* Studio lighting */}
           <ambientLight intensity={0.5} />
           <spotLight
             position={[5, 10, 5]}
@@ -111,7 +141,6 @@ const Display = ({ products }) => {
             castShadow
           />
 
-          {/* Optional user control */}
           <OrbitControls />
         </Suspense>
       </Canvas>
@@ -121,8 +150,8 @@ const Display = ({ products }) => {
       {!fullscreen ? (
         <div className="display-menu">
           {products.map((product) => (
-            <button key={product} onClick={() => setProduct(product)}>
-              {product}
+            <button key={product.id} onClick={() => setProduct(product)}>
+              {product.name}
             </button>
           ))}
         </div>

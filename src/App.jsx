@@ -5,7 +5,7 @@ import Display from './routes/display';
 import './index.scss';
 
 function App() {
-  const products = ['duffle', 'socks', 'shirt', 'blanket'];
+  // const products = ['duffle', 'socks', 'shirt', 'blanket'];
 
   return (
     <div className='app'>
@@ -16,8 +16,8 @@ function App() {
             <a href="#/display">Display</a>
           </div>
         } />
-        <Route path="/pedestal" element={<Pedestal products={products} />} />
-        <Route path="/display" element={<Display products={products} />} />
+        <Route path="/pedestal" element={<Pedestal />} />
+        <Route path="/display" element={<Display />} />
       </Routes>
     </div>
   );
