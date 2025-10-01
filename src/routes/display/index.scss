@@ -13,6 +13,13 @@
     left: 25% !important;
     height: 75% !important;
     top: 12.5% !important;
+    transition: all 1s cubic-bezier(0.39,-0.44, 0.66, 1.36);
+
+    &.hidden {
+      transform: scale(.5);
+      width: 75%;
+      height: 100%;
+    }
   }
 
   &-video {
