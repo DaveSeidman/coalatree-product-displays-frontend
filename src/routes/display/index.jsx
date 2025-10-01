@@ -50,8 +50,9 @@ function FeatureBubbles({ features }) {
             {/* Billboarded image inside */}
             <Billboard follow={true} position={[0, -.05, 1]}>
               <Image
-                url="images/uv-resistant.png"
+                url="images/four-way-stretch.png"
                 scale={[0.25, 0.25, 1]}
+                position={[0, 0, .1]}
                 transparent
               />
             </Billboard>
