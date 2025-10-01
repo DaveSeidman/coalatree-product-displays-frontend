@@ -1,9 +1,10 @@
 import React, { useRef, useState, useEffect } from "react";
+import products from '../../assets/data/products.json'
 import { io } from "socket.io-client";
 
 import "./index.scss";
 
-const Pedestal = ({ products }) => {
+const Pedestal = () => {
   const socketRef = useRef();
   const [started, setStarted] = useState(false);
   const [rotation, setRotation] = useState(0);
@@ -35,21 +36,21 @@ const Pedestal = ({ products }) => {
 
       // alert('here')
 
-      // try {
-      //   const response = await DeviceMotionEvent.requestPermission();
-      //   alert(response)
-      //   if (response !== "granted") {
-      //     alert("Motion permission denied");
-      //     return;
-      //   }
-      // } catch (err) {
-      //   console.error("Error requesting motion permission:", err);
-      //   alert(err)
-      //   return;
-      // }
+      try {
+        const response = await DeviceMotionEvent.requestPermission();
+        // alert(response)
+        if (response !== "granted") {
+          alert("Motion permission denied");
+          return;
+        }
+      } catch (err) {
+        console.error("Error requesting motion permission:", err);
+        alert(err)
+        return;
+      }
 
-      addEventListener("deviceorientation", handleOrientation);
-      alert('granted')
+      window.addEventListener("deviceorientation", handleOrientation);
+      // alert('granted')
       setStarted(true);
     }
   };
@@ -65,14 +66,16 @@ const Pedestal = ({ products }) => {
     <div className="pedestal">
       <h1>Pedestal</h1>
       <p>{socketRef.current?.id || 'not connected'}</p>
-      <p>{rotation}</p>
-      {started ? (
-        <div className="pedestal-products">
-          {products.map(product =>
-            <button onClick={() => setProduct(product)}>{product}</button>)
-          }
-        </div>
-      ) : (
+      <p>permissions: {started ? 'granted' : 'denied'}</p>
+      <p>rotation: {rotation}</p>
+      <div className="pedestal-menu">
+        {products.map((product) => (
+          <button key={product.id} onClick={() => setProduct(product)}>
+            {product.name}
+          </button>
+        ))}
+      </div>
+      {!started && (
         <button
           type="button"
           style={{

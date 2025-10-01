@@ -65,6 +65,7 @@ function FeatureBubbles({ features }) {
 
 const Display = () => {
   const socketRef = useRef();
+  const videoRef = useRef();
   const [fullscreen, setFullscreen] = useState(false);
   const isLocalhost = window.location.hostname !== "daveseidman.github.io";
   const URL = isLocalhost
@@ -103,9 +104,20 @@ const Display = () => {
 
   return (
     <div className="display">
-      <h1>Display</h1>
-
+      <div className="display-video">
+        <video
+          key={selectedProduct?.id}
+          ref={videoRef}
+          className="display-video-player"
+          autoPlay
+          loop
+          muted
+        >
+          {selectedProduct && (<source src={`./videos/${selectedProduct.name}.mp4`} />)}
+        </video>
+      </div>
       <Canvas
+        className="display-canvas"
         shadows
         camera={{ position: [0, 1, 2], fov: 35 }}
         style={{ position: "absolute", inset: 0 }}
@@ -146,7 +158,7 @@ const Display = () => {
         </Suspense>
       </Canvas>
 
-      <p>{`rotation: ${rotation.toFixed(2)}`}</p>
+      {/* <p>{`rotation: ${rotation.toFixed(2)}`}</p> */}
 
       {!fullscreen ? (
         <div className="display-menu">
