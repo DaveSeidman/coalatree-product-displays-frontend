@@ -14,7 +14,7 @@ function ProductModel({ url }) {
         speed={1} // Animation speed, defaults to 1
         rotationIntensity={1} // XYZ rotation intensity, defaults to 1
         floatIntensity={1} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
-        floatingRange={[-.1, .1]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
+        floatingRange={[0, .1]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
       >
         <primitive object={scene} />
       </Float>
@@ -73,6 +73,7 @@ const Display = () => {
     : "https://coalatree-product-displays-backend.onrender.com/";
 
   const [rotation, setRotation] = useState(0);
+  const [rotating, setRotating] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const handleFullscreenChange = () => {
@@ -117,49 +118,48 @@ const Display = () => {
           {selectedProduct && (<source src={`./videos/${selectedProduct.name}.mp4`} />)}
         </video>
       </div>
-      <Canvas
-        className="display-canvas"
-        shadows
-        camera={{ position: [0, 1, 2], fov: 35 }}
-        style={{ position: "absolute", inset: 0 }}
-      >
-        <Suspense fallback={null}>
-          <Environment preset="sunset" background blur={2} />
+      <div className={`display-scene ${rotating ? '' : 'hidden'}`}>
+        <Canvas
+          className="display-scene-canvas"
+          shadows
+          camera={{ position: [0, .1, 2], fov: 35 }}
+        >
+          <Suspense fallback={null}>
+            <Environment preset="sunset" background blur={.3} />
 
-          {selectedProduct && (
-            <group rotation={[0, rotation * (Math.PI / 180), 0]}>
-              <ProductModel url={selectedProduct.model} />
-              <FeatureBubbles features={selectedProduct.features} />
-            </group>
-          )}
+            {selectedProduct && (
+              <group rotation={[0, rotation * (Math.PI / 180), 0]}>
+                <ProductModel url={selectedProduct.model} />
+                <FeatureBubbles features={selectedProduct.features} />
+              </group>
+            )}
 
-          <ContactShadows
-            position={[0, -0.5, 0]}
-            opacity={0.25}
-            scale={5}
-            blur={0.25}
-            far={1}
-          />
+            <ContactShadows
+              position={[0, 0, 0]}
+              opacity={0.25}
+              scale={5}
+              blur={0.25}
+              far={1}
+            />
 
-          <ambientLight intensity={0.5} />
-          <spotLight
-            position={[5, 10, 5]}
-            angle={0.3}
-            penumbra={1}
-            intensity={2}
-            castShadow
-          />
-          <directionalLight
-            position={[-5, 5, -5]}
-            intensity={1}
-            castShadow
-          />
+            <ambientLight intensity={0.5} />
+            <spotLight
+              position={[5, 10, 5]}
+              angle={0.3}
+              penumbra={1}
+              intensity={2}
+              castShadow
+            />
+            <directionalLight
+              position={[-5, 5, -5]}
+              intensity={1}
+              castShadow
+            />
 
-          <OrbitControls />
-        </Suspense>
-      </Canvas>
-
-      {/* <p>{`rotation: ${rotation.toFixed(2)}`}</p> */}
+            <OrbitControls target={[0, 0.25, 0]} enablePan={false} />
+          </Suspense>
+        </Canvas>
+      </div>
 
       {!fullscreen ? (
         <div className="display-menu">
