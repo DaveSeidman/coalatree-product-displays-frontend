@@ -23,22 +23,29 @@ const Pedestal = () => {
     }
   };
 
-  const startExperience = async () => {
+  const startExperience = async (force) => {
+    if (force) {
+      window.addEventListener("deviceorientation", handleOrientation);
+      setStarted(true);
+      return
+    }
     if (location.hostname === 'localhost') {
       setStarted(true);
     }
     else {
 
       try {
-        const response = await DeviceMotionEvent.requestPermission();
-        // alert(response)
-        if (response !== "granted") {
-          alert("Motion permission denied");
-          return;
+        if (DeviceMotionEvent.requestPermission) {
+          const response = await DeviceMotionEvent.requestPermission();
+          // alert(response)
+          if (response !== "granted") {
+            // alert("Motion permission denied");
+            return;
+          }
         }
       } catch (err) {
         console.error("Error requesting motion permission:", err);
-        alert(err)
+        // alert(err)
         return;
       }
 
@@ -68,19 +75,32 @@ const Pedestal = () => {
         ))}
       </div>
       {!started && (
-        <button
-          type="button"
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-          }}
-          onClick={startExperience}
-        >
-          Touch to begin
-        </button>
-
+        <>
+          <button
+            type="button"
+            // style={{
+            //   position: "absolute",
+            //   top: "50%",
+            //   left: "50%",
+            //   transform: "translate(-50%, -50%)",
+            // }}
+            onClick={startExperience}
+          >
+            Touch to begin
+          </button>
+          <button
+            type="button"
+            // style={{
+            //   position: "absolute",
+            //   top: "50%",
+            //   left: "50%",
+            //   transform: "translate(-50%, -50%)",
+            // }}
+            onClick={() => startExperience(true)}
+          >
+            Test in Browser
+          </button>
+        </>
       )}
     </div>
   );
