@@ -28,13 +28,6 @@ const Pedestal = () => {
       setStarted(true);
     }
     else {
-      // if (document.documentElement.requestFullscreen) {
-      //   await document.documentElement.requestFullscreen();
-      // } else if (document.documentElement.webkitRequestFullScreen) {
-      //   document.documentElement.webkitRequestFullScreen();
-      // }
-
-      // alert('here')
 
       try {
         const response = await DeviceMotionEvent.requestPermission();
@@ -50,13 +43,12 @@ const Pedestal = () => {
       }
 
       window.addEventListener("deviceorientation", handleOrientation);
-      // alert('granted')
       setStarted(true);
     }
   };
 
   const setProduct = (product) => {
-    socketRef.current = io({
+    socketRef.current = io(URL, {
       transports: ["websocket"],
       query: { role: "pedestal", product: product.name },
     });
