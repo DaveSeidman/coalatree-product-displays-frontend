@@ -91,7 +91,7 @@ const Display = () => {
     setSelectedProduct(product);
     socketRef.current = io(URL, {
       transports: ["websocket"],
-      query: { role: "display", product },
+      query: { role: "display", product: product.name },
     });
 
     socketRef.current?.on("connect", () => {
