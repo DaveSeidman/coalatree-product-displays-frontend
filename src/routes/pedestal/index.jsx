@@ -58,7 +58,7 @@ const Pedestal = () => {
   const setProduct = (product) => {
     socketRef.current = io({
       transports: ["websocket"],
-      query: { role: "pedestal", product },
+      query: { role: "pedestal", product: product.name },
     });
   }
 
