@@ -70,7 +70,8 @@ const Display = () => {
   const isLocalhost = window.location.hostname !== "daveseidman.github.io";
   const URL = isLocalhost
     ? `http://${location.hostname}:8000`
-    : "https://cocktail-generator-server.onrender.com/";
+    : "https://coalatree-product-displays-backend.onrender.com/";
+
   const [rotation, setRotation] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
