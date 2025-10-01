@@ -160,36 +160,27 @@ const Display = () => {
           </Suspense>
         </Canvas>
       </div>
-
-      {!fullscreen ? (
-        <div className="display-menu">
-          {products.map((product) => (
-            <button key={product.id} onClick={() => setProduct(product)}>
-              {product.name}
-            </button>
-          ))}
-        </div>
-      ) : (
-        <button
-          type="button"
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-          }}
-          onClick={async () => {
-            try {
-              await document.documentElement.requestFullscreen();
-              setFullscreen(true);
-            } catch (err) {
-              console.error("Failed to enter fullscreen:", err);
-            }
-          }}
-        >
-          Touch To Begin
-        </button>
-      )}
+      <div className="display-menu">
+        {products.map((product) => (
+          <button key={product.id} onClick={() => setProduct(product)}>
+            {product.name}
+          </button>
+        ))}
+      </div>
+      {!fullscreen && (<button
+        type="button"
+        className="display-fullscreen"
+        onClick={async () => {
+          try {
+            await document.documentElement.requestFullscreen();
+            setFullscreen(true);
+          } catch (err) {
+            console.error("Failed to enter fullscreen:", err);
+          }
+        }}
+      >
+        Touch To Begin
+      </button>)}
     </div>
   );
 };
