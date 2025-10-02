@@ -31,4 +31,9 @@ html, body, #root, .app {
       padding: 1rem 2rem;
     }
   }
+
+  .hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
 }

@@ -74,6 +74,7 @@ const Display = () => {
 
   const [rotation, setRotation] = useState(0);
   const [rotating, setRotating] = useState(true);
+  const [showProduct, setShowProduct] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const handleFullscreenChange = () => {
@@ -118,22 +119,22 @@ const Display = () => {
           {selectedProduct && (<source src={`./videos/${selectedProduct.name}.mp4`} />)}
         </video>
       </div>
-      <div className={`display-scene ${rotating ? '' : 'hidden'}`}>
+      <div className={`display-scene ${showProduct ? '' : 'hidden'}`}>
         <Canvas
+          key={showProduct}
           className="display-scene-canvas"
           shadows
+          dpr={.25}
           camera={{ position: [0, .1, 2], fov: 35 }}
         >
           <Suspense fallback={null}>
-            <Environment preset="sunset" background blur={.3} />
-
+            <Environment preset="sunset" blur={.3} />
             {selectedProduct && (
               <group rotation={[0, rotation * (Math.PI / 180), 0]}>
                 <ProductModel url={selectedProduct.model} />
                 <FeatureBubbles features={selectedProduct.features} />
               </group>
             )}
-
             <ContactShadows
               position={[0, 0, 0]}
               opacity={0.25}
@@ -141,7 +142,6 @@ const Display = () => {
               blur={0.25}
               far={1}
             />
-
             <ambientLight intensity={0.5} />
             <spotLight
               position={[5, 10, 5]}
@@ -155,7 +155,10 @@ const Display = () => {
               intensity={1}
               castShadow
             />
-
+            <mesh position={[0, -.1, 0]}>
+              <meshNormalMaterial />
+              <cylinderGeometry args={[.8, .8, .1]} />
+            </mesh>
             <OrbitControls target={[0, 0.25, 0]} enablePan={false} />
           </Suspense>
         </Canvas>
@@ -165,22 +168,33 @@ const Display = () => {
           <button key={product.id} onClick={() => setProduct(product)}>
             {product.name}
           </button>
+
         ))}
       </div>
-      {!fullscreen && (<button
-        type="button"
-        className="display-fullscreen"
-        onClick={async () => {
-          try {
-            await document.documentElement.requestFullscreen();
-            setFullscreen(true);
-          } catch (err) {
-            console.error("Failed to enter fullscreen:", err);
-          }
-        }}
-      >
-        Touch To Begin
-      </button>)}
+      {!fullscreen && location.hostname !== 'localhost' && (
+        <button
+          type="button"
+          className="display-fullscreen"
+          onClick={async () => {
+            try {
+              await document.documentElement.requestFullscreen();
+              setFullscreen(true);
+            } catch (err) {
+              console.error("Failed to enter fullscreen:", err);
+            }
+          }}
+        >
+          Touch To Begin
+        </button>
+      )}
+      {location.hostname === 'localhost' && (
+        <button
+          type="button"
+          style={{ position: 'absolute', bottom: 0, right: 0 }}
+          onClick={() => setShowProduct(!showProduct)}>
+          {showProduct ? 'hide product' : 'show product'}
+        </button>
+      )}
     </div>
   );
 };

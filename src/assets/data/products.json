@@ -1,8 +1,8 @@
 [
   {
     "id": 1,
-    "name": "shirt",
-    "model": "models/shirt.glb",
+    "name": "sunshirt",
+    "model": "models/sunshirt.glb",
     "features": [
       "Lightweight",
       "UV Resistant",
@@ -15,8 +15,8 @@
   },
   {
     "id": 2,
-    "name": "blanket",
-    "model": "models/blanket.glb",
+    "name": "kachula",
+    "model": "models/kachula.glb",
     "features": [
       "Water and spill reiststant",
       "Integrated Modular System",

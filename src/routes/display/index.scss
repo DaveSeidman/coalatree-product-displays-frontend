@@ -21,12 +21,14 @@
 
   &-scene {
     position: absolute;
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-    width: 80vw;
-    height: 80vw;
-    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    // border-radius: 50%;
+    // top: 50%;
+    // left: 50%;
+    // width: 100vw;
+    // height: 90vh;
+    // transform: translate(-50%, -50%);
     transform-origin: center;
 
     // width: 50% !important;
@@ -41,13 +43,13 @@
       height: 100%;
       transform-origin: center;
       position: absolute;
-      transition: all 1s cubic-bezier(0.39,-0.44, 0.66, 1.36);
+      // transition: all 1s cubic-bezier(0.39,-0.44, 0.66, 1.36);
     }
 
     &.hidden {
-      transform: translate(-50%, -50%) scale(0);
-      width: 75%;
-      height: 100%;
+      // transform: translate(-50%, -50%) scale(0);
+      // width: 75%;
+      // height: 100%;
       // TODO: set display none on delay so R3F halts rendering
 
 
