@@ -24,7 +24,7 @@ function ProductModel({ url }) {
 
 function FeatureBubbles({ features }) {
   return (
-    <group>
+    <group position={[0, .33, 0]}>
       {features.map((feature, index) => {
         const angle = (index / features.length) * 360;
         const radians = angle * (Math.PI / 180);
@@ -125,10 +125,10 @@ const Display = () => {
           className="display-scene-canvas"
           shadows
           dpr={.25}
-          camera={{ position: [0, .1, 2], fov: 35 }}
+          camera={{ position: [0, .1, 3], fov: 35 }}
         >
           <Suspense fallback={null}>
-            <Environment preset="sunset" blur={.3} />
+            <Environment preset="sunset" blur={.3} background />
             {selectedProduct && (
               <group rotation={[0, rotation * (Math.PI / 180), 0]}>
                 <ProductModel url={selectedProduct.model} />
@@ -157,9 +157,15 @@ const Display = () => {
             />
             <mesh position={[0, -.1, 0]}>
               <meshNormalMaterial />
-              <cylinderGeometry args={[.8, .8, .1]} />
+              <cylinderGeometry args={[.6, .6, .01]} />
             </mesh>
-            <OrbitControls target={[0, 0.25, 0]} enablePan={false} />
+            <OrbitControls
+              target={[0, 0.25, 0]}
+              enablePan={false}
+              enableZoom={false}
+              minPolarAngle={80 * (Math.PI / 180)}
+              maxPolarAngle={80 * (Math.PI / 180)}
+            />
           </Suspense>
         </Canvas>
       </div>

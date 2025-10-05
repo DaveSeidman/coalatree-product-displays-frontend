@@ -17,6 +17,7 @@ const Pedestal = () => {
   const handleOrientation = (event) => {
     const rotation = event.alpha;
 
+
     if (socketRef.current && rotation !== null) {
       setRotation(rotation)
       socketRef.current.emit('rotation', { rotation });
@@ -24,34 +25,27 @@ const Pedestal = () => {
   };
 
   const startExperience = async (force) => {
-    if (force) {
-      window.addEventListener("deviceorientation", handleOrientation);
-      setStarted(true);
-      return
-    }
-    if (location.hostname === 'localhost') {
-      setStarted(true);
-    }
-    else {
+    try {
+      if (DeviceMotionEvent.requestPermission) {
+        const response = await DeviceMotionEvent.requestPermission();
+        if (response === "granted") {
+          // window.addEventListener('devicemotion', handleOrientation);
 
-      try {
-        if (DeviceMotionEvent.requestPermission) {
-          const response = await DeviceMotionEvent.requestPermission();
-          // alert(response)
-          if (response !== "granted") {
-            // alert("Motion permission denied");
-            return;
-          }
+          // alert("Motion permission denied");
+          // return;
         }
-      } catch (err) {
-        console.error("Error requesting motion permission:", err);
-        // alert(err)
-        return;
       }
-
-      window.addEventListener("deviceorientation", handleOrientation);
-      setStarted(true);
     }
+    catch (err) {
+      alert('err')
+      console.error("Error requesting motion permission:", err);
+      // alert(err)
+      return;
+    }
+
+    window.addEventListener("deviceorientation", handleOrientation);
+    setStarted(true);
+    // }
   };
 
   const setProduct = (product) => {
@@ -78,24 +72,12 @@ const Pedestal = () => {
         <>
           <button
             type="button"
-            // style={{
-            //   position: "absolute",
-            //   top: "50%",
-            //   left: "50%",
-            //   transform: "translate(-50%, -50%)",
-            // }}
             onClick={startExperience}
           >
             Touch to begin
           </button>
           <button
             type="button"
-            // style={{
-            //   position: "absolute",
-            //   top: "50%",
-            //   left: "50%",
-            //   transform: "translate(-50%, -50%)",
-            // }}
             onClick={() => startExperience(true)}
           >
             Test in Browser
