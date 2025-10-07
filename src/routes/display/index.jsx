@@ -81,7 +81,11 @@ const Display = () => {
     : "https://coalatree-product-displays-backend.onrender.com/";
 
   const [rotation, setRotation] = useState(0);
-  const [rotating, setRotating] = useState(true);
+  const prevRotation = useRef(0);
+  const ROTATION_THRESHOLD = 1;
+  const ROTATION_RESET_DELAY = 1;
+  const [rotating, setRotating] = useState(false);
+  const rotatedTimeout = useRef();
   const [showProduct, setShowProduct] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
@@ -113,6 +117,14 @@ const Display = () => {
     });
 
     socketRef.current?.on("rotation", (data) => {
+      if (Math.abs(data.rotation - prevRotation.current) > ROTATION_THRESHOLD) {
+        if (rotatedTimeout.current) clearTimeout(rotatedTimeout.current)
+        rotatedTimeout.current = setTimeout(() => {
+          setRotating(false);
+        }, ROTATION_RESET_DELAY * 1000)
+        setRotating(true);
+      }
+      prevRotation.current = data.rotation;
       setRotation(data.rotation || 0);
     });
   };
@@ -131,7 +143,7 @@ const Display = () => {
           {selectedProduct && (<source src={`./videos/${selectedProduct.name}.mp4`} />)}
         </video>
       </div>
-      <div className={`display-scene ${showProduct ? '' : 'hidden'}`}>
+      <div className={`display-scene ${rotating ? '' : 'hidden'}`}>
         <Canvas
           key={showProduct}
           className="display-scene-canvas"
