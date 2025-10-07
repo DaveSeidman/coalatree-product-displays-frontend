@@ -5,7 +5,6 @@ import Display from './routes/display';
 import './index.scss';
 
 function App() {
-  // const products = ['duffle', 'socks', 'shirt', 'blanket'];
 
   return (
     <div className='app'>

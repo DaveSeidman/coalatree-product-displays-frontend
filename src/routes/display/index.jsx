@@ -1,11 +1,12 @@
 import React, { useRef, useState, useEffect, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { io } from "socket.io-client";
+import predestalModel from '../../assets/models/pedestal.glb';
 import products from "../../assets/data/products.json";
 import { Environment, ContactShadows, OrbitControls, useGLTF, MeshTransmissionMaterial, Billboard, Image, Float } from "@react-three/drei";
 import "./index.scss";
 
-function ProductModel({ url }) {
+const ProductModel = ({ url }) => {
   const group = useRef();
   const { scene } = useGLTF(url);
   return (
@@ -20,6 +21,13 @@ function ProductModel({ url }) {
       </Float>
     </group>
   );
+}
+
+const Pedestal = () => {
+  const { scene } = useGLTF(predestalModel)
+  return (
+    <primitive object={scene} />
+  )
 }
 
 function FeatureBubbles({ features }) {
@@ -67,10 +75,11 @@ const Display = () => {
   const socketRef = useRef();
   const videoRef = useRef();
   const [fullscreen, setFullscreen] = useState(false);
-  const isLocalhost = window.location.hostname !== "daveseidman.github.io";
-  const URL = isLocalhost
-    ? `http://${location.hostname}:8000`
-    : "https://coalatree-product-displays-backend.onrender.com/";
+  // const isLocalhost = window.location.hostname !== "daveseidman.github.io";
+  const socketServer = 'https://caolatree-products-backend.ngrok.app/' // isLocalhost
+  // ? `http://${location.hostname}:8000`
+  // : 'https://caolatree-products-backend.ngrok.app/'
+  // : "https://coalatree-product-displays-backend.onrender.com/";
 
   const [rotation, setRotation] = useState(0);
   const [rotating, setRotating] = useState(true);
@@ -91,7 +100,7 @@ const Display = () => {
 
   const setProduct = (product) => {
     setSelectedProduct(product);
-    socketRef.current = io(URL, {
+    socketRef.current = io(socketServer, {
       transports: ["websocket"],
       query: { role: "display", product: product.name },
     });
@@ -124,15 +133,20 @@ const Display = () => {
           key={showProduct}
           className="display-scene-canvas"
           shadows
-          dpr={.25}
+          gl={{ clearColor: '#eaeaea' }} // 👈 add this line
+
+          dpr={.5}
           camera={{ position: [0, .1, 3], fov: 35 }}
         >
           <Suspense fallback={null}>
-            <Environment preset="sunset" blur={.3} background />
+            {/* <color attach="background" args={['#eaeaea']} />  👈 scene background color */}
+
+            <Environment preset="sunset" blur={.3} />
             {selectedProduct && (
               <group rotation={[0, rotation * (Math.PI / 180), 0]}>
                 <ProductModel url={selectedProduct.model} />
                 <FeatureBubbles features={selectedProduct.features} />
+                <Pedestal />
               </group>
             )}
             <ContactShadows
@@ -155,10 +169,10 @@ const Display = () => {
               intensity={1}
               castShadow
             />
-            <mesh position={[0, -.1, 0]}>
-              <meshNormalMaterial />
-              <cylinderGeometry args={[.6, .6, .01]} />
-            </mesh>
+            {/* <mesh position={[0, -.1, 0]}>
+              <meshStandardMaterial />
+              <cylinderGeometry args={[.6, .6, .01, 64]} />
+            </mesh> */}
             <OrbitControls
               target={[0, 0.25, 0]}
               enablePan={false}
