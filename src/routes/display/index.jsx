@@ -75,11 +75,10 @@ const Display = () => {
   const socketRef = useRef();
   const videoRef = useRef();
   const [fullscreen, setFullscreen] = useState(false);
-  // const isLocalhost = window.location.hostname !== "daveseidman.github.io";
-  const socketServer = 'https://caolatree-products-backend.ngrok.app/' // isLocalhost
-  // ? `http://${location.hostname}:8000`
-  // : 'https://caolatree-products-backend.ngrok.app/'
-  // : "https://coalatree-product-displays-backend.onrender.com/";
+  const isLocalhost = location.hostname.indexOf('localhost') >= 0 || location.hostname.indexOf('ngrok') >= 0;
+  const socketServer = isLocalhost
+    ? 'https://caolatree-products-backend.ngrok.app/'
+    : "https://coalatree-product-displays-backend.onrender.com/";
 
   const [rotation, setRotation] = useState(0);
   const [rotating, setRotating] = useState(true);
@@ -99,6 +98,10 @@ const Display = () => {
   }, []);
 
   const setProduct = (product) => {
+    if (socketRef.current && socketRef.current.connected) {
+      console.log("Disconnecting existing socket:", socketRef.current.id);
+      socketRef.current.disconnect();
+    }
     setSelectedProduct(product);
     socketRef.current = io(socketServer, {
       transports: ["websocket"],
@@ -110,7 +113,7 @@ const Display = () => {
     });
 
     socketRef.current?.on("rotation", (data) => {
-      setRotation(data.zRotation || data.rotation || 0);
+      setRotation(data.rotation || 0);
     });
   };
 
@@ -135,7 +138,7 @@ const Display = () => {
           shadows
           gl={{ clearColor: '#eaeaea' }} // 👈 add this line
 
-          dpr={.5}
+          dpr={1}
           camera={{ position: [0, .1, 3], fov: 35 }}
         >
           <Suspense fallback={null}>
@@ -191,7 +194,7 @@ const Display = () => {
 
         ))}
       </div>
-      {!fullscreen && location.hostname !== 'localhost' && (
+      {!fullscreen && !isLocalhost && (
         <button
           type="button"
           className="display-fullscreen"
@@ -204,15 +207,15 @@ const Display = () => {
             }
           }}
         >
-          Touch To Begin
+          Fullscreen
         </button>
       )}
-      {location.hostname === 'localhost' && (
+      {isLocalhost && (
         <button
           type="button"
-          style={{ position: 'absolute', bottom: 0, right: 0 }}
+          style={{ position: 'absolute', top: 0, right: 0 }}
           onClick={() => setShowProduct(!showProduct)}>
-          {showProduct ? 'hide product' : 'show product'}
+          {showProduct ? 'hide' : 'show'} product
         </button>
       )}
     </div>

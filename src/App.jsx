@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Pedestal from './routes/pedestal';
 import Display from './routes/display';
 import './index.scss';
 
 function App() {
-
   return (
     <div className='app'>
       <Routes>

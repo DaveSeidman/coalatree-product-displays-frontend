@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import products from '../../assets/data/products.json'
 import { io } from "socket.io-client";
 
@@ -8,11 +8,11 @@ const Pedestal = () => {
   const socketRef = useRef();
   const [started, setStarted] = useState(false);
   const [rotation, setRotation] = useState(0);
-  const isLocalhost = window.location.hostname !== "daveseidman.github.io";
-  const URL = isLocalhost
-    ? `http://${location.hostname}:8000`
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const isLocalhost = location.hostname.indexOf('localhost') >= 0 || location.hostname.indexOf('ngrok') >= 0;
+  const socketServer = isLocalhost
+    ? 'https://caolatree-products-backend.ngrok.app/'
     : "https://coalatree-product-displays-backend.onrender.com/";
-
 
   const handleOrientation = (event) => {
     const rotation = event.alpha;
@@ -25,31 +25,28 @@ const Pedestal = () => {
   };
 
   const startExperience = async (force) => {
+
     try {
       if (DeviceMotionEvent.requestPermission) {
         const response = await DeviceMotionEvent.requestPermission();
         if (response === "granted") {
-          // window.addEventListener('devicemotion', handleOrientation);
 
-          // alert("Motion permission denied");
-          // return;
         }
       }
     }
     catch (err) {
       alert('err')
       console.error("Error requesting motion permission:", err);
-      // alert(err)
       return;
     }
 
     window.addEventListener("deviceorientation", handleOrientation);
     setStarted(true);
-    // }
   };
 
   const setProduct = (product) => {
-    socketRef.current = io(URL, {
+    setSelectedProduct(product)
+    socketRef.current = io(socketServer, {
       transports: ["websocket"],
       query: { role: "pedestal", product: product.name },
     });
@@ -57,10 +54,19 @@ const Pedestal = () => {
 
   return (
     <div className="pedestal">
-      <h1>Pedestal</h1>
-      <p>{socketRef.current?.id || 'not connected'}</p>
-      <p>permissions: {started ? 'granted' : 'denied'}</p>
-      <p>rotation: {rotation}</p>
+      <div className="pedestal-info">
+        {!started && (
+          <button
+            type="button"
+            onClick={startExperience}
+          >
+            Touch to begin
+          </button>
+        )}
+        <p>connected: {selectedProduct?.name}</p>
+        <p>permissions: {started ? 'granted' : 'denied'}</p>
+        <p>rotation: {Math.round(rotation)}</p>
+      </div>
       <div className="pedestal-menu">
         {products.map((product) => (
           <button key={product.id} onClick={() => setProduct(product)}>
@@ -68,22 +74,7 @@ const Pedestal = () => {
           </button>
         ))}
       </div>
-      {!started && (
-        <>
-          <button
-            type="button"
-            onClick={startExperience}
-          >
-            Touch to begin
-          </button>
-          <button
-            type="button"
-            onClick={() => startExperience(true)}
-          >
-            Test in Browser
-          </button>
-        </>
-      )}
+
     </div>
   );
 };
