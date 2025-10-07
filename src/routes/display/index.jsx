@@ -217,7 +217,7 @@ const Display = () => {
           Fullscreen
         </button>
       )}
-      {isLocalhost && (
+      {isLocalhost || true && (
         <button
           type="button"
           style={{ position: 'absolute', top: 0, right: 0 }}
