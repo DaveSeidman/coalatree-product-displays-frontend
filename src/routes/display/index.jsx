@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
+import { Color, DoubleSide } from 'three'
 import { io } from "socket.io-client";
 import predestalModel from '../../assets/models/pedestal.glb';
 import products from "../../assets/data/products.json";
@@ -12,7 +13,7 @@ const ProductModel = ({ url }) => {
   return (
     <group ref={group} position={[0, 0, 0]}>
       <Float
-        speed={1} // Animation speed, defaults to 1
+        speed={1.5} // Animation speed, defaults to 1
         rotationIntensity={1} // XYZ rotation intensity, defaults to 1
         floatIntensity={1} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
         floatingRange={[0, .1]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
@@ -39,29 +40,30 @@ function FeatureBubbles({ features }) {
 
         return (
           <group key={index} rotation={[0, radians, 0]}>
-            {/* Bubble sphere */}
-            <mesh position={[0, 0, 1]}>
+            <mesh position={[0, 0, .8]}>
               <sphereGeometry args={[0.1, 32, 32]} />
               <MeshTransmissionMaterial
-                thickness={0.2}
-                roughness={0.1}
-                transmission={1}
-                ior={1.3}
+                thickness={0.25}
+                roughness={0.2}
+                transmission={.9}
+                ior={1.1}
                 chromaticAberration={0.02}
                 anisotropy={0.1}
-                distortion={0.1}
-                distortionScale={0.2}
-                temporalDistortion={0.1}
+                distortion={0.6}
+                distortionScale={0.9}
+                temporalDistortion={0.0}
+              // color={new Color('rgba(115, 244, 241, 0)')}
+
+              // TODO: add envMap={} here with a plain light cyan background or if we can use the <Environment> component's texture from below even better
               />
             </mesh>
-
-            {/* Billboarded image inside */}
-            <Billboard follow={true} position={[0, -.05, 1]}>
+            <Billboard follow={true} rotation={[0, 0, 0]} position={[0, -.09, .82]}>
               <Image
                 url="images/four-way-stretch.png"
-                scale={[0.25, 0.25, 1]}
-                position={[0, 0, .1]}
+                scale={[0.5, 0.5, 1]}
+                position={[0, 0, 0]}
                 transparent
+              // side={DoubleSide}
               />
             </Billboard>
           </group>
@@ -86,7 +88,7 @@ const Display = () => {
   const ROTATION_RESET_DELAY = 1;
   const [rotating, setRotating] = useState(false);
   const rotatedTimeout = useRef();
-  const [showProduct, setShowProduct] = useState(true);
+  const [showProduct, setShowProduct] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const handleFullscreenChange = () => {
@@ -143,14 +145,11 @@ const Display = () => {
           {selectedProduct && (<source src={`./videos/${selectedProduct.name}.mp4`} />)}
         </video>
       </div>
-      <div className={`display-scene ${rotating ? '' : 'hidden'}`}>
+      <div className={`display-scene ${rotating || showProduct ? '' : 'hidden'}`}>
         <Canvas
           key={showProduct}
           className="display-scene-canvas"
-          shadows
-          gl={{ clearColor: '#eaeaea' }} // 👈 add this line
-
-          dpr={1}
+          dpr={.75}
           camera={{ position: [0, .1, 3], fov: 35 }}
         >
           <Suspense fallback={null}>
@@ -184,10 +183,6 @@ const Display = () => {
               intensity={1}
               castShadow
             />
-            {/* <mesh position={[0, -.1, 0]}>
-              <meshStandardMaterial />
-              <cylinderGeometry args={[.6, .6, .01, 64]} />
-            </mesh> */}
             <OrbitControls
               target={[0, 0.25, 0]}
               enablePan={false}

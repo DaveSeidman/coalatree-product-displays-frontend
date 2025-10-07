@@ -17,7 +17,6 @@ const Pedestal = () => {
   const handleOrientation = (event) => {
     const rotation = event.alpha;
 
-
     if (socketRef.current && rotation !== null) {
       setRotation(rotation)
       socketRef.current.emit('rotation', { rotation });
