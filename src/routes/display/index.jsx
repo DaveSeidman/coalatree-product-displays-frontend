@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, Suspense } from "react";
-import { Canvas } from "@react-three/fiber";
-import { Color, DoubleSide } from 'three'
+import { Canvas, useLoader } from "@react-three/fiber";
+import { BackSide, Color, DoubleSide, TextureLoader, RepeatWrapping } from 'three'
 import { io } from "socket.io-client";
 import predestalModel from '../../assets/models/pedestal.glb';
 import products from "../../assets/data/products.json";
@@ -13,10 +13,10 @@ const ProductModel = ({ url }) => {
   return (
     <group ref={group} position={[0, 0, 0]}>
       <Float
-        speed={1.5} // Animation speed, defaults to 1
-        rotationIntensity={.75} // XYZ rotation intensity, defaults to 1
-        floatIntensity={.75} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
-        floatingRange={[0, .1]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
+        speed={1.5}
+        rotationIntensity={.75}
+        floatIntensity={.75}
+        floatingRange={[0, .1]}
       >
         <primitive object={scene} scale={.4} position={[0, .33, 0]} />
       </Float>
@@ -31,40 +31,61 @@ const Pedestal = () => {
   )
 }
 
-function FeatureBubbles({ features }) {
+const Background = () => {
+  const texture = useLoader(TextureLoader, 'images/pattern.png')
+  useEffect(() => {
+    // Enable repeating
+    texture.wrapS = RepeatWrapping
+    texture.wrapT = RepeatWrapping
+    // texture.offset = [1, 1]
+    // Repeat more times horizontally and vertically
+    texture.repeat.set(4, 3)  // increase these values to tile more tightly
+  }, [texture])
+  return (
+    <mesh>
+      <sphereGeometry args={[4, 32, 32]} />
+      <meshStandardMaterial
+        side={BackSide}
+        map={texture}
+
+        toneMapped={false}
+      />
+    </mesh>
+  )
+}
+
+const FeatureBubbles = ({ features, rotation }) => {
+  const rotationInRadians = rotation * (Math.PI / 180);
+  // console.log(rotationInRadians)
   return (
     <group position={[0, .33, 0]}>
       {features.map((feature, index) => {
         const angle = (index / features.length) * 360;
         const radians = angle * (Math.PI / 180);
-
+        // const scale = ((rotationInRadians - radians) / 2) - 21;
+        // const scale = radians 
         return (
           <group key={index} rotation={[0, radians, 0]}>
             <mesh position={[0, 0, .8]}>
-              <sphereGeometry args={[0.1, 8, 8]} />
+              <sphereGeometry args={[0.1, 8, 16]} />
               <MeshTransmissionMaterial
-                thickness={0.25}
+                thickness={0.1}
                 roughness={0.2}
                 transmission={.9}
                 ior={1.1}
-                chromaticAberration={0.02}
+                color={new Color('rgba(220, 220, 220)')}
+                chromaticAberration={0.015}
                 anisotropy={0.1}
-                distortion={0.6}
+                distortion={0.9}
                 distortionScale={0.9}
-              // temporalDistortion={0.0}
-              // samples={1}
-              // color={new Color('rgba(115, 244, 241, 0)')}
-
-              // TODO: add envMap={} here with a plain light cyan background or if we can use the <Environment> component's texture from below even better
               />
             </mesh>
-            <Billboard follow={true} rotation={[0, 0, 0]} position={[0, -.09, .82]}>
+            <Billboard follow={false} rotation={[0, 0, 0]} position={[0, -.07, .8]}>
               <Image
-                url="images/four-way-stretch.png"
-                scale={[0.5, 0.5, 1]}
+                url={feature}
+                scale={[0.4, 0.4, 1]}
                 position={[0, 0, 0]}
                 transparent
-              // side={DoubleSide}
               />
             </Billboard>
           </group>
@@ -94,7 +115,8 @@ const Display = () => {
   const [showProduct, setShowProduct] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  const spotRef = useRef();
+  const [lightRotation, setLightRotation] = useState(0);
+  const lightRotationAnimation = useRef();
 
   const handleFullscreenChange = () => {
     setFullscreen(document.fullscreenElement !== null);
@@ -136,9 +158,14 @@ const Display = () => {
     });
   };
 
+  const rotateLights = () => {
+    setLightRotation(prev => prev += .0025);
+    lightRotationAnimation.current = requestAnimationFrame(rotateLights);
+  }
+
   const rotate = () => {
 
-    setRotation(prev => prev += .1);
+    setRotation(prev => prev += .05);
     if (autoRotate) autoRotateAnimation.current = requestAnimationFrame(rotate);
   }
 
@@ -152,6 +179,14 @@ const Display = () => {
       autoRotateAnimation.current = null;
     })
   }, [autoRotate])
+
+  useEffect(() => {
+    lightRotationAnimation.current = requestAnimationFrame(rotateLights);
+
+    return (() => {
+      cancelAnimationFrame(lightRotationAnimation.current);
+    })
+  })
 
   return (
     <div className="display">
@@ -173,18 +208,17 @@ const Display = () => {
           key={showProduct}
           className="display-scene-canvas"
           dpr={1}
-          fog={{ color: '#b8c6d1', near: 0, far: 1 }} // 👈 Add this line
-
           camera={{ position: [0, .1, 3], fov: 35 }}
         >
+          <Background />
           <Suspense fallback={null}>
             {/* <color attach="background" args={['#eaeaea']} />  👈 scene background color */}
 
-            <Environment preset="sunset" blur={.3} background />
+            <Environment preset="sunset" blur={.3} background environmentIntensity={1} />
             {selectedProduct && (
               <group rotation={[0, rotation * (Math.PI / 180), 0]}>
                 <ProductModel url={selectedProduct.model} />
-                <FeatureBubbles features={selectedProduct.features} />
+                <FeatureBubbles rotation={rotation} features={selectedProduct.features} />
                 <Pedestal />
               </group>
             )}
@@ -192,40 +226,39 @@ const Display = () => {
               resolution={256}
               position={[0, 0, 0]}
               opacity={0.25}
-              scale={5}
-              blur={0.25}
+              scale={4}
+              blur={0.5}
               far={1}
             />
-            <group rotation={[0, -rotation * (Math.PI / 180), 0]}>
-              <mesh position={[0, 0, 1]}>
-                <sphereGeometry args={[.1, 16, 16]} />
-                <meshNormalMaterial />
-              </mesh>
+
+            {/* light rig */}
+            <group rotation={[0, lightRotation, 0]}>
               <spotLight
-                ref={spotRef}
-                position={[0, 1, -1]}   // back one, up one
-                angle={Math.PI / 6}     // 30° cone
-                penumbra={0.5}
-                intensity={20}
-                color="#ffffff"
+                position={[-2, 1, 0]}   // back one, up one
+                angle={Math.PI / 8}     // 30° cone
+                penumbra={0.9}
+                intensity={10}
+                color="#f8d2a3ff"
                 castShadow
-                target-position={[0, 0, -1]} // make sure it points at origin
+                target-position={[2, -1, 0]} // make sure it points at origin
               />
-              {/* <spotLightHelper  /> */}
+              <spotLight
+                position={[2, 1, 0]}   // back one, up one
+                angle={Math.PI / 24}     // 30° cone
+                penumbra={0.9}
+                intensity={1}
+                color="#a3dff8ff"
+                castShadow
+                target-position={[-2, -1, 0]} // make sure it points at origin
+              />
             </group>
-            {/* <ambientLight intensity={1} /> */}
-            {/* <spotLight
-              position={[1, 5, 2]}
-              angle={0.6}
-              penumbra={1}
-              intensity={2}
-              castShadow
-            /> */}
-            <directionalLight
+            {/* <ambientLight intensity={.5} /> */}
+
+            {/* <directionalLight
               position={[-5, 5, -5]}
               intensity={1}
               castShadow
-            />
+            /> */}
             <OrbitControls
               target={[0, 0.25, 0]}
               enablePan={false}

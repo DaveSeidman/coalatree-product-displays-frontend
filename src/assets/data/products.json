@@ -4,13 +4,13 @@
     "name": "sunshirt",
     "model": "models/sunshirt.glb",
     "features": [
-      "Lightweight",
-      "UV Resistant",
-      "Four-Way Stretch",
-      "Quick Dry",
-      "Sustainably Made",
-      "Reinforced Seams",
-      "Packable"
+      "images/quick-dry.png",
+      "images/reinforced-seams.png",
+      "images/quick-dry.png",
+      "images/sustainably-made.png",
+      "images/reinforced-seams.png",
+      "images/packable.png",
+      "images/four-way-stretch.png"
     ]
   },
   {
@@ -18,9 +18,10 @@
     "name": "kachula",
     "model": "models/kachula.glb",
     "features": [
-      "Water and spill reiststant",
-      "Integrated Modular System",
-      "Three Season Comfort"
+      "images/modular-system.png",
+      "images/three-season-comfort.png",
+      "images/spill-resistant.png",
+      "images/packable.png"
     ]
   },
   {
@@ -28,10 +29,7 @@
     "name": "socks",
     "model": "models/socks.glb",
     "features": [
-      "Four-Way Stretch",
-      "Quick Dry",
-      "Sustainably Made",
-      "Reinforced Seams"
+      "images/four-way-stretch.png"
     ]
   },
   {
@@ -39,11 +37,8 @@
     "name": "duffle",
     "model": "models/duffle.glb",
     "features": [
-      "U-shaped Zipper",
-      "Removable Straps",
-      "Nylon webbing handles",
-      "Exterior pocket",
-      "High contrast liner"
+      "images/removable-straps.png",
+      "images/exterior-pocket.png"
     ]
   }
 ]
