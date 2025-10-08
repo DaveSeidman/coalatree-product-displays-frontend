@@ -14,11 +14,11 @@ const ProductModel = ({ url }) => {
     <group ref={group} position={[0, 0, 0]}>
       <Float
         speed={1.5} // Animation speed, defaults to 1
-        rotationIntensity={1} // XYZ rotation intensity, defaults to 1
-        floatIntensity={1} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
+        rotationIntensity={.75} // XYZ rotation intensity, defaults to 1
+        floatIntensity={.75} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
         floatingRange={[0, .1]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
       >
-        <primitive object={scene} />
+        <primitive object={scene} scale={.4} position={[0, .33, 0]} />
       </Float>
     </group>
   );
@@ -41,7 +41,7 @@ function FeatureBubbles({ features }) {
         return (
           <group key={index} rotation={[0, radians, 0]}>
             <mesh position={[0, 0, .8]}>
-              <sphereGeometry args={[0.1, 32, 32]} />
+              <sphereGeometry args={[0.1, 8, 8]} />
               <MeshTransmissionMaterial
                 thickness={0.25}
                 roughness={0.2}
@@ -51,7 +51,8 @@ function FeatureBubbles({ features }) {
                 anisotropy={0.1}
                 distortion={0.6}
                 distortionScale={0.9}
-                temporalDistortion={0.0}
+              // temporalDistortion={0.0}
+              // samples={1}
               // color={new Color('rgba(115, 244, 241, 0)')}
 
               // TODO: add envMap={} here with a plain light cyan background or if we can use the <Environment> component's texture from below even better
@@ -85,11 +86,15 @@ const Display = () => {
   const [rotation, setRotation] = useState(0);
   const prevRotation = useRef(0);
   const ROTATION_THRESHOLD = 1;
-  const ROTATION_RESET_DELAY = 1;
+  const ROTATION_RESET_DELAY = 3;
   const [rotating, setRotating] = useState(false);
   const rotatedTimeout = useRef();
-  const [showProduct, setShowProduct] = useState(false);
+  const [autoRotate, setAutoRotate] = useState(false);
+  const autoRotateAnimation = useRef();
+  const [showProduct, setShowProduct] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const spotRef = useRef();
 
   const handleFullscreenChange = () => {
     setFullscreen(document.fullscreenElement !== null);
@@ -131,6 +136,23 @@ const Display = () => {
     });
   };
 
+  const rotate = () => {
+
+    setRotation(prev => prev += .1);
+    if (autoRotate) autoRotateAnimation.current = requestAnimationFrame(rotate);
+  }
+
+  useEffect(() => {
+    if (autoRotate) {
+      autoRotateAnimation.current = requestAnimationFrame(rotate);
+    }
+
+    return (() => {
+      cancelAnimationFrame(autoRotateAnimation.current);
+      autoRotateAnimation.current = null;
+    })
+  }, [autoRotate])
+
   return (
     <div className="display">
       <div className="display-video">
@@ -141,6 +163,7 @@ const Display = () => {
           autoPlay
           loop
           muted
+          playsInline
         >
           {selectedProduct && (<source src={`./videos/${selectedProduct.name}.mp4`} />)}
         </video>
@@ -149,13 +172,15 @@ const Display = () => {
         <Canvas
           key={showProduct}
           className="display-scene-canvas"
-          dpr={.75}
+          dpr={1}
+          fog={{ color: '#b8c6d1', near: 0, far: 1 }} // 👈 Add this line
+
           camera={{ position: [0, .1, 3], fov: 35 }}
         >
           <Suspense fallback={null}>
             {/* <color attach="background" args={['#eaeaea']} />  👈 scene background color */}
 
-            <Environment preset="sunset" blur={.3} />
+            <Environment preset="sunset" blur={.3} background />
             {selectedProduct && (
               <group rotation={[0, rotation * (Math.PI / 180), 0]}>
                 <ProductModel url={selectedProduct.model} />
@@ -164,20 +189,38 @@ const Display = () => {
               </group>
             )}
             <ContactShadows
+              resolution={256}
               position={[0, 0, 0]}
               opacity={0.25}
               scale={5}
               blur={0.25}
               far={1}
             />
-            <ambientLight intensity={0.5} />
-            <spotLight
-              position={[5, 10, 5]}
-              angle={0.3}
+            <group rotation={[0, -rotation * (Math.PI / 180), 0]}>
+              <mesh position={[0, 0, 1]}>
+                <sphereGeometry args={[.1, 16, 16]} />
+                <meshNormalMaterial />
+              </mesh>
+              <spotLight
+                ref={spotRef}
+                position={[0, 1, -1]}   // back one, up one
+                angle={Math.PI / 6}     // 30° cone
+                penumbra={0.5}
+                intensity={20}
+                color="#ffffff"
+                castShadow
+                target-position={[0, 0, -1]} // make sure it points at origin
+              />
+              {/* <spotLightHelper  /> */}
+            </group>
+            {/* <ambientLight intensity={1} /> */}
+            {/* <spotLight
+              position={[1, 5, 2]}
+              angle={0.6}
               penumbra={1}
               intensity={2}
               castShadow
-            />
+            /> */}
             <directionalLight
               position={[-5, 5, -5]}
               intensity={1}
@@ -217,14 +260,20 @@ const Display = () => {
           Fullscreen
         </button>
       )}
-      {isLocalhost || true && (
+      <div
+        style={{ position: 'absolute', top: 0, right: 0 }}
+      >
         <button
           type="button"
-          style={{ position: 'absolute', top: 0, right: 0 }}
           onClick={() => setShowProduct(!showProduct)}>
           {showProduct ? 'hide' : 'show'} product
         </button>
-      )}
+        <button
+          type="button"
+          onClick={() => setAutoRotate(!autoRotate)}>
+          {autoRotate ? 'stop' : 'autoRotate'}
+        </button>
+      </div>
     </div>
   );
 };
