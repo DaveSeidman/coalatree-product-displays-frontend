@@ -113,7 +113,7 @@ const Display = () => {
   const rotatedTimeout = useRef();
   const [autoRotate, setAutoRotate] = useState(false);
   const autoRotateAnimation = useRef();
-  const [showProduct, setShowProduct] = useState(true);
+  const [showProduct, setShowProduct] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const [lightRotation, setLightRotation] = useState(0);
@@ -300,6 +300,7 @@ const Display = () => {
           </button>
         </div>
       )}
+      <h1 className="customdesign">Greater Zion Inspired Custom Design</h1>
     </div>
   );
 };

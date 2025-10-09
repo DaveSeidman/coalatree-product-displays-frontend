@@ -54,4 +54,15 @@
       height: 1692px;
     }
   }
+  .customdesign {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    font-family: 'Nunito Sans';
+    transform: translateX(-50%);
+    color: white;
+    text-wrap: nowrap;
+    font-size: 50px;
+
+  }
 }
