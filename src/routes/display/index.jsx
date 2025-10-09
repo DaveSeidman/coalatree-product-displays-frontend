@@ -4,7 +4,7 @@ import { BackSide, Color, DoubleSide, TextureLoader, RepeatWrapping } from 'thre
 import { io } from "socket.io-client";
 import predestalModel from '../../assets/models/pedestal.glb';
 import products from "../../assets/data/products.json";
-import { Environment, ContactShadows, OrbitControls, useGLTF, MeshTransmissionMaterial, Billboard, Image, Float } from "@react-three/drei";
+import { Environment, ContactShadows, OrbitControls, useGLTF, MeshTransmissionMaterial, Billboard, Image, Float, Text } from "@react-three/drei";
 import "./index.scss";
 
 const ProductModel = ({ url }) => {
@@ -54,9 +54,10 @@ const Background = () => {
   )
 }
 
-const FeatureBubbles = ({ features, rotation }) => {
-  const rotationInRadians = rotation * (Math.PI / 180);
-  // console.log(rotationInRadians)
+// TODO: take in rotation data + orbit controls data to fade or shrink bubbles further from camera
+const FeatureBubbles = ({ features }) => {
+  // const rotationInRadians = rotation * (Math.PI / 180);
+  // console.log(rotation)
   return (
     <group position={[0, .33, 0]}>
       {features.map((feature, index) => {
@@ -80,7 +81,7 @@ const FeatureBubbles = ({ features, rotation }) => {
                 distortionScale={0.9}
               />
             </mesh>
-            <Billboard follow={false} rotation={[0, 0, 0]} position={[0, -.07, .8]}>
+            <Billboard follow={true} rotation={[0, 0, 0]} position={[0, -.07, .8]}>
               <Image
                 url={feature}
                 scale={[0.4, 0.4, 1]}
