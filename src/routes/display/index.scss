@@ -35,12 +35,10 @@
         opacity: 0;
       }
     }
-    // transition: opacity 1s, visibility 1s;
 
     &-canvas {
       width: 100%;
       height: 100%;
-      // transform-origin: center;
       position: absolute;
       transition: opacity 1s, visibility 1s;
 

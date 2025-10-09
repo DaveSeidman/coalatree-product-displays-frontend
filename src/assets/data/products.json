@@ -4,13 +4,13 @@
     "name": "sunshirt",
     "model": "models/sunshirt.glb",
     "features": [
+      "images/lightweight.png",
+      "images/uv-resistant.png",
+      "images/four-way-stretch.png",
       "images/quick-dry.png",
-      "images/reinforced-seams.png",
-      "images/quick-dry.png",
-      "images/sustainably-made.png",
-      "images/reinforced-seams.png",
       "images/packable.png",
-      "images/four-way-stretch.png"
+      "images/reinforced-seams.png",
+      "images/sustainably-made.png"
     ]
   },
   {
@@ -18,10 +18,11 @@
     "name": "kachula",
     "model": "models/kachula.glb",
     "features": [
-      "images/modular-system.png",
-      "images/three-season-comfort.png",
-      "images/spill-resistant.png",
-      "images/packable.png"
+      "images/sustainably-made.png",
+      "images/water-and-rip-resistant.png",
+      "images/multi-use.png",
+      "images/packable.png",
+      "images/all-season.png"
     ]
   },
   {
@@ -29,16 +30,22 @@
     "name": "socks",
     "model": "models/socks.glb",
     "features": [
-      "images/four-way-stretch.png"
+      "images/durable.png",
+      "images/moisture-wicking.png",
+      "images/one-size-fits-all.png",
+      "images/sustainably-made.png"
     ]
   },
   {
     "id": 4,
-    "name": "duffle",
-    "model": "models/duffle.glb",
+    "name": "duffel",
+    "model": "models/duffel.glb",
     "features": [
-      "images/removable-straps.png",
-      "images/exterior-pocket.png"
+      "images/u-shaped-zipper.png",
+      "images/versatile-duffel-to-backpack-design.png",
+      "images/fits-in-overhead-compartment.png",
+      "images/made-from-upcycled-fabric.png",
+      "images/waterproof-coating.png"
     ]
   }
 ]

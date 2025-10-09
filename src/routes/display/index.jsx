@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, Suspense } from "react";
 import { Canvas, useLoader } from "@react-three/fiber";
-import { BackSide, Color, DoubleSide, TextureLoader, RepeatWrapping } from 'three'
+import { BackSide, Color, Vector2, TextureLoader, RepeatWrapping } from 'three'
 import { io } from "socket.io-client";
 import predestalModel from '../../assets/models/pedestal.glb';
 import products from "../../assets/data/products.json";
@@ -37,7 +37,7 @@ const Background = () => {
     // Enable repeating
     texture.wrapS = RepeatWrapping
     texture.wrapT = RepeatWrapping
-    // texture.offset = [1, 1]
+    texture.offset = new Vector2(1, .1);
     // Repeat more times horizontally and vertically
     texture.repeat.set(4, 3)  // increase these values to tile more tightly
   }, [texture])
@@ -206,16 +206,13 @@ const Display = () => {
       </div>
       <div className={`display-scene ${rotating || showProduct ? '' : 'hidden'}`}>
         <Canvas
-          key={showProduct}
           className="display-scene-canvas"
           dpr={1}
           camera={{ position: [0, .1, 3], fov: 35 }}
         >
           <Background />
           <Suspense fallback={null}>
-            {/* <color attach="background" args={['#eaeaea']} />  👈 scene background color */}
-
-            <Environment preset="sunset" blur={.3} background environmentIntensity={1} />
+            <Environment preset="sunset" blur={.3} background />
             {selectedProduct && (
               <group rotation={[0, rotation * (Math.PI / 180), 0]}>
                 <ProductModel url={selectedProduct.model} />
@@ -231,35 +228,28 @@ const Display = () => {
               blur={0.5}
               far={1}
             />
-
             {/* light rig */}
             <group rotation={[0, lightRotation, 0]}>
               <spotLight
-                position={[-2, 1, 0]}   // back one, up one
-                angle={Math.PI / 8}     // 30° cone
+                position={[-2, 1, 0]}
+                angle={Math.PI / 8}
                 penumbra={0.9}
                 intensity={10}
                 color="#f8d2a3ff"
                 castShadow
-                target-position={[2, -1, 0]} // make sure it points at origin
+                target-position={[2, -1, 0]}
               />
               <spotLight
-                position={[2, 1, 0]}   // back one, up one
-                angle={Math.PI / 24}     // 30° cone
+                position={[2, 1, 0]}
+                angle={Math.PI / 24}
                 penumbra={0.9}
                 intensity={1}
                 color="#a3dff8ff"
                 castShadow
-                target-position={[-2, -1, 0]} // make sure it points at origin
+                target-position={[-2, -1, 0]}
               />
             </group>
-            {/* <ambientLight intensity={.5} /> */}
-
-            {/* <directionalLight
-              position={[-5, 5, -5]}
-              intensity={1}
-              castShadow
-            /> */}
+            <ambientLight intensity={.5} />
             <OrbitControls
               target={[0, 0.25, 0]}
               enablePan={false}
