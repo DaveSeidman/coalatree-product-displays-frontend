@@ -260,15 +260,15 @@ const Display = () => {
           </Suspense>
         </Canvas>
       </div>
-      <div className="display-menu">
+      {!fullscreen && (<div className="display-menu">
         {products.map((product) => (
           <button key={product.id} onClick={() => setProduct(product)}>
             {product.name}
           </button>
 
         ))}
-      </div>
-      {!fullscreen && !isLocalhost && (
+      </div>)}
+      {!fullscreen && (
         <button
           type="button"
           className="display-fullscreen"
@@ -284,20 +284,22 @@ const Display = () => {
           Fullscreen
         </button>
       )}
-      <div
-        style={{ position: 'absolute', top: 0, right: 0 }}
-      >
-        <button
-          type="button"
-          onClick={() => setShowProduct(!showProduct)}>
-          {showProduct ? 'hide' : 'show'} product
-        </button>
-        <button
-          type="button"
-          onClick={() => setAutoRotate(!autoRotate)}>
-          {autoRotate ? 'stop' : 'autoRotate'}
-        </button>
-      </div>
+      {!fullscreen && (
+        <div
+          style={{ position: 'absolute', top: 0, right: 0 }}
+        >
+          <button
+            type="button"
+            onClick={() => setShowProduct(!showProduct)}>
+            {showProduct ? 'hide' : 'show'} product
+          </button>
+          <button
+            type="button"
+            onClick={() => setAutoRotate(!autoRotate)}>
+            {autoRotate ? 'stop' : 'autoRotate'}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
